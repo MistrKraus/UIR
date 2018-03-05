@@ -16,20 +16,33 @@ public class HanojskeVeze {
 
     public static void main(String[] args) {
         int n = 3;
-        int maxDepht = 100;
+        int maxDepht = 300;
         SOLUTION = new Tower(n);
         SOLUTION.setSolutionState();
 
         Tower t = new Tower(n, 0);
+
         openBFS.add(t.getTowerCopy());
         bfs();
+        Tower t1 = closedBFS.get(closedBFS.size() - 1);
+        while (t1.getPrevious() != null) {
+            t1.printTower();
+            t1 = t1.getPrevious();
+        }
+        t.printTower();
 
-        openDFS.add(t);
-        dfs(maxDepht, 0);
+        openDFS.add(t.getTowerCopy());
+        dfs(maxDepht);
+        t1 = closedDFS.get(closedDFS.size() - 1);
+        while (t1.getPrevious() != null) {
+            t1.printTower();
+            t1 = t1.getPrevious();
+        }
+        t.printTower();
     }
 
     public static void bfs() {
-        int count = 0;
+//        int count = 0;
         boolean visited = false;
         while (openBFS.size() > 0) {
             Tower t = openBFS.pollFirst();
@@ -52,28 +65,31 @@ public class HanojskeVeze {
                         continue;
                     }
 
-                    count++;
+//                    count++;
+                    t1.setPrevious(t);
                     openBFS.add(t1);
+//                    t1.printTower();
 
                     if (t1.equals(SOLUTION)) {
-                        System.out.println("Vyreseno pomoci BFS " + count);
+                        System.out.println("Vyreseno pomoci BFS");
+                        closedBFS.add(t1);
                         return;
                     }
-//                    t1.printTower();
                 }
             }
         }
     }
 
-    public static boolean dfs(int maxDepht, int depht) {
-        int count = 0;
+    public static boolean dfs(int maxDepht) {
+//        int count = 0;
         boolean visited = false;
         while (!openDFS.empty()) {
             Tower t = openDFS.pop();
 //            t.printTower();
 
             if (t.equals(SOLUTION)) {
-                System.out.println("Vyreseno pomoci DFS " + count);
+                System.out.println("Vyreseno pomoci DFS ");
+                closedDFS.add(t);
                 return true;
             }
 
@@ -94,13 +110,14 @@ public class HanojskeVeze {
                         continue;
                     }
 
+//                    t1.printTower();
+                    t1.setPrevious(t);
                     openDFS.add(t1);
-                    count++;
+//                    count++;
                 }
             }
 
             closedDFS.add(t);
-//            System.out.println(closedDFS.size());
         }
         System.out.println("DFS nevyresilo");
 
@@ -112,6 +129,7 @@ class Tower {
     private final int n;
     private char[][] state;
     private int depht;
+    private Tower previous;
 
     public Tower(int n, int depht) {
         this(n);
@@ -131,18 +149,6 @@ class Tower {
                 }
             }
         }
-
-//        printTower(state);
-//        move(0, 1);
-//        printTower(state);
-//        move(0, 1);
-//        printTower(state);
-//        move(0, 1);
-//        printTower(state);
-//        move(0, 1);
-//        printTower(state);
-//        move(0, 1);
-//        printTower(state);
     }
 
     public Tower(int n, char[][] state, int depht) {
@@ -159,8 +165,6 @@ class Tower {
     public Tower move(int from, int to) {
         if (from < 0 || from >= state[1].length || to < 0 || to >= state[1].length || from == to)
             return this;
-
-//        System.out.println("hey?");
 
         int x = 0;
         while (x < state.length - 1)
@@ -234,17 +238,20 @@ class Tower {
         return depht;
     }
 
+    public void setPrevious(Tower t) {
+        previous = t;
+    }
+
+    public Tower getPrevious() {
+        return previous;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         Tower tower = (Tower) o;
-
-//        for (int i = 0; i < n; i++)
-//            for (int j = 0; j < 3; j++)
-//                if (tower.state[i][j] != state[i][j])
-//                    return false;
 
         return Arrays.deepEquals(state, tower.state);
     }
